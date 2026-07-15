@@ -12,6 +12,9 @@
 #define DUTY_MIN        20
 #define DUTY_MAX        80
 
+#define AMPLITUDE_MIN   25
+#define AMPLITUDE_MAX   100
+
 typedef enum
 {
     WAVE_SQUARE = 0,
@@ -23,6 +26,7 @@ typedef enum
 extern volatile WaveTypeDef current_wave;
 extern volatile uint32_t wave_freq;
 extern volatile uint8_t square_duty;
+extern volatile uint8_t wave_amplitude;
 extern volatile uint8_t wave_output_enabled;
 extern volatile uint16_t wave_index;
 
@@ -30,6 +34,7 @@ void Wave_Init(void);
 void Wave_SetType(WaveTypeDef wave);
 void Wave_SetFreq(uint32_t freq);
 void Wave_SetDuty(uint8_t duty);
+void Wave_SetAmplitude(uint8_t amplitude);
 void Wave_SetOutput(uint8_t enable);
 void Wave_ToggleOutput(void);
 void Wave_ResetIndex(void);

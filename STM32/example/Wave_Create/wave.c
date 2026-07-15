@@ -5,6 +5,7 @@
 volatile WaveTypeDef current_wave = WAVE_SQUARE;
 volatile uint32_t wave_freq = 1000;
 volatile uint8_t square_duty = 50;
+volatile uint8_t wave_amplitude = 100;
 volatile uint8_t wave_output_enabled = 1;
 volatile uint16_t wave_index = 0;
 
@@ -54,11 +55,33 @@ static uint16_t Wave_GetSineValue(uint16_t index)
     return sine_table[index];
 }
 
+static uint16_t Wave_ApplyAmplitude(uint16_t value)
+{
+    int32_t scaled;
+
+    scaled = (int32_t)value - 32768;
+    scaled = scaled * wave_amplitude / 100;
+    scaled += 32768;
+
+    if (scaled < 0)
+    {
+        return 0;
+    }
+
+    if (scaled > 65535)
+    {
+        return 65535;
+    }
+
+    return (uint16_t)scaled;
+}
+
 void Wave_Init(void)
 {
     current_wave = WAVE_SQUARE;
     wave_freq = 1000;
     square_duty = 50;
+    wave_amplitude = 100;
     wave_output_enabled = 1;
     wave_index = 0;
 }
@@ -109,6 +132,22 @@ void Wave_SetDuty(uint8_t duty)
     wave_index = 0;
 }
 
+void Wave_SetAmplitude(uint8_t amplitude)
+{
+    if (amplitude < AMPLITUDE_MIN)
+    {
+        amplitude = AMPLITUDE_MIN;
+    }
+
+    if (amplitude > AMPLITUDE_MAX)
+    {
+        amplitude = AMPLITUDE_MAX;
+    }
+
+    wave_amplitude = amplitude;
+    wave_index = 0;
+}
+
 void Wave_SetOutput(uint8_t enable)
 {
     wave_output_enabled = enable ? 1 : 0;
@@ -147,10 +186,12 @@ void Wave_OutputISR(void)
     else if (current_wave == WAVE_SAW)
     {
         dac_value = Wave_GetSawValue(wave_index);
+        dac_value = Wave_ApplyAmplitude(dac_value);
     }
     else if (current_wave == WAVE_SINE)
     {
         dac_value = Wave_GetSineValue(wave_index);
+        dac_value = Wave_ApplyAmplitude(dac_value);
     }
     else
     {
