@@ -1,5 +1,8 @@
 #include "key.h"
-#include "Delay.h"
+
+#define KEY_DEBOUNCE_SCANS          1
+#define KEY_REPEAT_DELAY_SCANS      15
+#define KEY_REPEAT_INTERVAL_SCANS   3
 
 void KEY_Init(void)
 {
@@ -20,55 +23,87 @@ void KEY_Init(void)
     GPIO_Init(GPIOA, &gpio);
 }
 
-uint8_t KEY_Scan(void)
+static uint8_t KEY_ReadCurrent(void)
 {
     if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_12) == RESET)
     {
-        Delay_ms(20);
-        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_12) == RESET)
-        {
-            while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_12) == RESET);
-            return KEY_1;
-        }
+        return KEY_1;
     }
 
     if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_13) == RESET)
     {
-        Delay_ms(20);
-        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_13) == RESET)
-        {
-            while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_13) == RESET);
-            return KEY_2;
-        }
+        return KEY_2;
     }
 
     if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) == RESET)
     {
-        Delay_ms(20);
-        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) == RESET)
-        {
-            while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) == RESET);
-            return KEY_3;
-        }
+        return KEY_3;
     }
 
     if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_15) == RESET)
     {
-        Delay_ms(20);
-        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_15) == RESET)
-        {
-            while (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_15) == RESET);
-            return KEY_4;
-        }
+        return KEY_4;
     }
 
     if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_8) == RESET)
     {
-        Delay_ms(20);
-        if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_8) == RESET)
+        return KEY_5;
+    }
+
+    return KEY_NONE;
+}
+
+uint8_t KEY_Scan(void)
+{
+    static uint8_t candidate_key = KEY_NONE;
+    static uint8_t stable_key = KEY_NONE;
+    static uint8_t debounce_scans = 0;
+    static uint8_t repeat_scans = 0;
+    uint8_t raw_key;
+
+    raw_key = KEY_ReadCurrent();
+
+    if (raw_key != candidate_key)
+    {
+        candidate_key = raw_key;
+        debounce_scans = 0;
+        return KEY_NONE;
+    }
+
+    if (debounce_scans < KEY_DEBOUNCE_SCANS)
+    {
+        debounce_scans++;
+        return KEY_NONE;
+    }
+
+    if (stable_key != candidate_key)
+    {
+        stable_key = candidate_key;
+        repeat_scans = 0;
+        return stable_key;
+    }
+
+    if (stable_key >= KEY_2 && stable_key <= KEY_5)
+    {
+        if (repeat_scans < KEY_REPEAT_DELAY_SCANS)
         {
-            while (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_8) == RESET);
-            return KEY_5;
+            repeat_scans++;
+
+            if (repeat_scans == KEY_REPEAT_DELAY_SCANS)
+            {
+                return stable_key;
+            }
+        }
+        else
+        {
+            repeat_scans++;
+
+            if (repeat_scans >= (KEY_REPEAT_DELAY_SCANS +
+                                 KEY_REPEAT_INTERVAL_SCANS))
+            {
+                repeat_scans = KEY_REPEAT_DELAY_SCANS;
+                return stable_key;
+            }
         }
     }
 
