@@ -5,6 +5,7 @@
 volatile WaveTypeDef current_wave = WAVE_SQUARE;
 volatile uint32_t wave_freq = 1000;
 volatile uint8_t square_duty = 50;
+volatile uint8_t wave_output_enabled = 1;
 volatile uint16_t wave_index = 0;
 
 static const uint16_t sine_table[SAMPLE_POINTS] =
@@ -58,6 +59,7 @@ void Wave_Init(void)
     current_wave = WAVE_SQUARE;
     wave_freq = 1000;
     square_duty = 50;
+    wave_output_enabled = 1;
     wave_index = 0;
 }
 
@@ -107,6 +109,22 @@ void Wave_SetDuty(uint8_t duty)
     wave_index = 0;
 }
 
+void Wave_SetOutput(uint8_t enable)
+{
+    wave_output_enabled = enable ? 1 : 0;
+    wave_index = 0;
+
+    if (wave_output_enabled == 0)
+    {
+        DAC8830_Write(0);
+    }
+}
+
+void Wave_ToggleOutput(void)
+{
+    Wave_SetOutput((uint8_t)(wave_output_enabled == 0));
+}
+
 void Wave_ResetIndex(void)
 {
     wave_index = 0;
@@ -115,6 +133,12 @@ void Wave_ResetIndex(void)
 void Wave_OutputISR(void)
 {
     uint16_t dac_value;
+
+    if (wave_output_enabled == 0)
+    {
+        DAC8830_Write(0);
+        return;
+    }
 
     if (current_wave == WAVE_SQUARE)
     {

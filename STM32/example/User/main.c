@@ -49,6 +49,16 @@ static void LCD_Show_Status(void)
         LCD_Show_String(0, 2, "ERROR ");
     }
 
+    LCD_Show_String(0, 10, "O:");
+    if (wave_output_enabled)
+    {
+        LCD_Show_String(0, 12, "ON ");
+    }
+    else
+    {
+        LCD_Show_String(0, 12, "OFF");
+    }
+
     LCD_Show_String(1, 0, "F:");
     LCD_Show_Num(1, 2, wave_freq, 4);
     LCD_Show_String(1, 6, "Hz");
@@ -123,7 +133,12 @@ int main(void)
     {
         key = KEY_Scan();
 
-        if (key == KEY_1)
+        if (key == KEY_1_LONG)
+        {
+            Wave_ToggleOutput();
+            LCD_Show_Status();
+        }
+        else if (key == KEY_1)
         {
             Wave_Switch_Next();
             LCD_Show_Status();

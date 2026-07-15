@@ -3,6 +3,7 @@
 #define KEY_DEBOUNCE_SCANS          1
 #define KEY_REPEAT_DELAY_SCANS      15
 #define KEY_REPEAT_INTERVAL_SCANS   3
+#define KEY_LONG_PRESS_SCANS        20
 
 void KEY_Init(void)
 {
@@ -59,7 +60,10 @@ uint8_t KEY_Scan(void)
     static uint8_t stable_key = KEY_NONE;
     static uint8_t debounce_scans = 0;
     static uint8_t repeat_scans = 0;
+    static uint8_t key1_long_reported = 0;
     uint8_t raw_key;
+    uint8_t previous_stable_key;
+    uint8_t previous_key1_long_reported;
 
     raw_key = KEY_ReadCurrent();
 
@@ -78,9 +82,42 @@ uint8_t KEY_Scan(void)
 
     if (stable_key != candidate_key)
     {
+        previous_stable_key = stable_key;
+        previous_key1_long_reported = key1_long_reported;
         stable_key = candidate_key;
         repeat_scans = 0;
+        key1_long_reported = 0;
+
+        if (previous_stable_key == KEY_1 && stable_key == KEY_NONE)
+        {
+            if (previous_key1_long_reported == 0)
+            {
+                return KEY_1;
+            }
+        }
+
+        if (stable_key == KEY_1)
+        {
+            return KEY_NONE;
+        }
+
         return stable_key;
+    }
+
+    if (stable_key == KEY_1)
+    {
+        if (repeat_scans < KEY_LONG_PRESS_SCANS)
+        {
+            repeat_scans++;
+
+            if (repeat_scans == KEY_LONG_PRESS_SCANS)
+            {
+                key1_long_reported = 1;
+                return KEY_1_LONG;
+            }
+        }
+
+        return KEY_NONE;
     }
 
     if (stable_key >= KEY_2 && stable_key <= KEY_5)

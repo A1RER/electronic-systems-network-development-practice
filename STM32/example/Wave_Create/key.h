@@ -10,6 +10,7 @@
 #define KEY_3       3
 #define KEY_4       4
 #define KEY_5       5
+#define KEY_1_LONG  6
 
 void KEY_Init(void);
 uint8_t KEY_Scan(void);
