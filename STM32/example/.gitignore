@@ -49,6 +49,22 @@ desktop.ini
 *.Bak
 Auto_FcArm_Cmd*.inp
 
+# Local legacy/backup sources kept for reference, not part of this build
+/Start/* - 副本.*
+/Start/startup_stm32f10x_cl.s
+/Start/startup_stm32f10x_hd.s
+/Start/startup_stm32f10x_hd_vl.s
+/Start/startup_stm32f10x_ld.s
+/Start/startup_stm32f10x_ld_vl.s
+/Start/startup_stm32f10x_md_vl.s
+/Start/startup_stm32f10x_xl.s
+/User/sine_timer.c
+/User/sine_timer.h
+/User/timer_old.h
+/User/wave_old.h
+/main.c
+/system/
+
 # Packaged exports
 *.zip
 *.7z
