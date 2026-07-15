@@ -1,0 +1,71 @@
+# OS and editor state
+.DS_Store
+Thumbs.db
+desktop.ini
+/.idea/
+/.agents/
+/.vscode/launch.json
+/.vscode/settings.json
+/.vscode/*.log
+
+# Local scratch and generated artifacts
+/tmp/
+/output/
+
+# EIDE generated state
+/build/
+/.eide/log/
+/.eide.usr.ctx.json
+*.ept
+*.eide-template
+
+# EIDE bundles generic CMSIS device examples that this STM32F103 target
+# does not compile. Keep .cmsis/include, which is part of the include path.
+/.cmsis/device/
+
+# Keil build products
+/Objects/
+/Listings/
+/DebugConfig/
+*.o
+*.obj
+*.d
+*.crf
+*.dep
+*.elf
+*.axf
+*.hex
+*.bin
+*.map
+*.lst
+*.list
+*.lnp
+*.htm
+
+# Keil per-user and backup files
+*.uvguix.*
+*.uvoptx
+*.uvprojx.bak
+*.Bak
+Auto_FcArm_Cmd*.inp
+
+# Local legacy/backup sources kept for reference, not part of this build
+/Start/* - 副本.*
+/Start/startup_stm32f10x_cl.s
+/Start/startup_stm32f10x_hd.s
+/Start/startup_stm32f10x_hd_vl.s
+/Start/startup_stm32f10x_ld.s
+/Start/startup_stm32f10x_ld_vl.s
+/Start/startup_stm32f10x_md_vl.s
+/Start/startup_stm32f10x_xl.s
+/User/sine_timer.c
+/User/sine_timer.h
+/User/timer_old.h
+/User/wave_old.h
+/main.c
+/system/
+
+# Packaged exports
+*.zip
+*.7z
+*.rar
